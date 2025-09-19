@@ -1,0 +1,97 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Boxing Club</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        .btn-hover { transition: all 0.3s ease; }
+        .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(220, 38, 38, 0.3); }
+    </style>
+</head>
+<body class="bg-black text-yellow-400 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl p-8 rounded-lg shadow-lg border border-yellow-500 bg-black">
+        <h1 class="text-5xl font-bold text-center text-yellow-400 mb-8" style="font-family: 'Bebas Neue', sans-serif;">Aura Boxing Club</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Walk-in Button -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfVBvWVHLHQfz3JQ8Ph7kFENuCAp8jKM9R1YeUIiYw40XfJfQ/viewform?usp=header" target="_blank" class="block">
+                <button class="w-full py-4 bg-yellow-500 text-black font-semibold rounded-lg text-xl btn-hover">Walk-in</button>
+            </a>
+            
+            <!-- Rising Star Button -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScqcsklFQ7RXJ8RxbkzhVFjduKnk1B-t9T_wz60SyliQ_ChHw/viewform?usp=header" target="_blank" class="block">
+                <button class="w-full py-4 bg-yellow-500 text-black font-semibold rounded-lg text-xl btn-hover">Rising Star</button>
+            </a>
+            
+            <!-- Absolute Boxer Button -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSe7pP9qSkxI_9Z8QKeNj0nJD6GUc4lyREAMbIbvOn8Isp6cRg/viewform?usp=header" target="_blank" class="block">
+                <button class="w-full py-4 bg-yellow-500 text-black font-semibold rounded-lg text-xl btn-hover">Absolute Boxer</button>
+            </a>
+            
+            <!-- Instagram Button -->
+            <a href="https://www.instagram.com/auraboxingclub/" target="_blank" class="block">
+                <button class="w-full py-4 bg-yellow-500 text-black font-semibold rounded-lg text-xl btn-hover">Follow on Instagram</button>
+            </a>
+            
+            <!-- WhatsApp Group Button -->
+            <a href="https://chat.whatsapp.com/LLmOqt5Kp620Ssp8Gl7zAs" target="_blank" class="block md:col-span-2">
+                <button class="w-full py-4 bg-green-500 text-black font-semibold rounded-lg text-xl btn-hover">WhatsApp Group</button>
+            </a>
+        </div>
+        <p class="text-center text-sm text-yellow-400 mt-6">Join us and unleash your inner champion!</p>
+    </div>
+
+    <script>
+        // Optional: Add click animations
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
